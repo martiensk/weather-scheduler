@@ -1,0 +1,6 @@
+{
+    "apiSecret": "your-api-secret",
+    "public": {
+        "apiBase": "/api"
+    }
+}
