@@ -13,5 +13,12 @@
     "apps/be",
     "apps/fe",
     "packages/shared-lib"
-  ]
+  ],
+  "devDependencies": {
+    "eslint": "^8.52.0"
+  },
+  "dependencies": {
+    "eslint-plugin-jsdoc": "^46.8.2",
+    "eslint-plugin-vue": "^9.18.0"
+  }
 }

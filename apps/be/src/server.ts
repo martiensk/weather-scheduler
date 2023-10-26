@@ -3,6 +3,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import expressSession, { SessionOptions } from 'express-session';
+// Auth
 import passport from 'passport';
 import auth0Strategy from 'passport-auth0';
 
@@ -31,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(expressSession(session));
 
+//#region Auth0
 if (!process.env.AUTH0_DOMAIN || !process.env.AUTH0_CLIENT_ID || !process.env.AUTH0_CLIENT_SECRET || !process.env.AUTH0_CALLBACK_URL) {
     throw new Error('Missing required environment variables for Auth0 configuration');
 }
@@ -67,6 +69,7 @@ passport.deserializeUser((user: Express.User, done) => {
     done(null, user);
 });
 
+//#endregion
 //#endregion
 
 app.use('/', indexRouter);
