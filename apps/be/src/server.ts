@@ -1,3 +1,4 @@
+import { open } from 'sqlite';
 import express, { CookieOptions } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -7,9 +8,13 @@ import expressSession, { SessionOptions } from 'express-session';
 import passport from 'passport';
 import auth0Strategy from 'passport-auth0';
 
+//#region Services
+import { init } from './services/startupService';
+//#endregion
+
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
-import checkRouter from './routes/check'
+import checkRouter from './routes/scheduler'
 
 require('dotenv').config();
 
@@ -31,6 +36,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(expressSession(session));
+
+//#region Initialise DB
+init().then(() => {
+    console.log('Database initialised');
+}).catch((err) => {
+    console.error('Error opening database: ' + err.message);
+    process.exit(1);
+});
+//#endregion
 
 //#region Auth0
 if (!process.env.AUTH0_DOMAIN || !process.env.AUTH0_CLIENT_ID || !process.env.AUTH0_CLIENT_SECRET || !process.env.AUTH0_CALLBACK_URL) {
@@ -73,7 +87,7 @@ passport.deserializeUser((user: Express.User, done) => {
 //#endregion
 
 app.use('/', indexRouter);
-app.use('/check', checkRouter);
+app.use('/scheduler', checkRouter);
 app.use('/users', usersRouter);
 
 export default app;
