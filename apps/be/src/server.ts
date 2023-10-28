@@ -5,6 +5,7 @@ import express, { CookieOptions } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import expressSession, { SessionOptions } from 'express-session';
+import cors from 'cors';
 // Auth
 import passport from 'passport';
 import auth0Strategy from 'passport-auth0';
@@ -21,6 +22,7 @@ import weatherRouter from './routes/weather';
 require('dotenv').config();
 
 const app = express();
+app.use(cors());
 
 const session = {
   secret: process.env.SESSION_SECRET,

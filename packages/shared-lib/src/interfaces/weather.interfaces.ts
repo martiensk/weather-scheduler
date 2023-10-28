@@ -19,6 +19,7 @@ export type IWeatherLocation = {
  * Represents the current weather conditions for a location.
  */
 export type IWeatherCurrent = {
+    updated: string,
     location: {
         name: string;
         region: string;

@@ -1,6 +1,6 @@
 {
     "apiSecret": "your-api-secret",
     "public": {
-        "apiBase": "/api"
+        "apiBase": "http://localhost:5000"
     }
 }

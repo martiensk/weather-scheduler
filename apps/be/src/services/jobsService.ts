@@ -6,8 +6,30 @@ import { ECacheKeys } from '../enums/cacheKeys.enum';
 import { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces';
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { getWeather } from './weatherService';
+import { getAllScheduledJobs } from './schedulerService';
+
+/**
+ * Retrieves all scheduled job details and their last run history from cache.
+ * @returns {IScheduledJob[]} An array of scheduled job details with their last run history.
+ */
+export const getAllJobDetails = async() => {
+  const allJobs = await getAllScheduledJobs();
+
+  if(!allJobs) { return ([] as IScheduledJob[]); }
+  allJobs.forEach((job) => {
+    const jobRunHistory = getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
+    let lastJobRun: IWeatherCurrent | undefined;
+    if(jobRunHistory && jobRunHistory.length > 0) {
+      lastJobRun = jobRunHistory[jobRunHistory.length - 1];
+    }
+    job.lastRun = lastJobRun;
+  });
+
+  return allJobs;
+};
 
 export const weatherJob = async(job: IScheduledJob) => {
+  console.log(`Running job ${job.id}`);
   // Get historic weathers from cache
   let cachedWeathers = getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
 
@@ -27,6 +49,7 @@ export const weatherJob = async(job: IScheduledJob) => {
   const weatherLookup = await getWeather(job.details.location);
 
   cachedWeathers.push({
+    updated: new Date().toISOString(),
     location: {
       name: weatherLookup.location.name,
       region: weatherLookup.location.region,
@@ -61,6 +84,7 @@ export const weatherJob = async(job: IScheduledJob) => {
 
   // Update the cache
   setCache(`${ECacheKeys.WEATHER_JOB}_${job.id}`, cachedWeathers);
+  console.log(`Job ${job.id} completed`);
 
   // TODO: Send the data to the front-end
 

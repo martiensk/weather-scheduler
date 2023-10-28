@@ -3,6 +3,7 @@
  */
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { getAllScheduledJobs, saveJob } from '../services/schedulerService';
+import { getAllJobDetails } from './../services/jobsService';
 import { Request, Response } from 'express';
 
 /**
@@ -34,5 +35,24 @@ export const addNewJob = async(req: Request, res: Response) => {
   } catch (ex) {
     console.log(ex);
     res.status(500).json({ success: false });
+  }
+};
+
+// Not sure why this is needed, but looks like the plugin does not recognise res.json([]) as a function return.
+// eslint-disable-next-line jsdoc/require-returns-check
+/**
+ * Retrieves details of all jobs.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {string} An array of all job details.
+ */
+export const getAllJobs = async(req: Request, res: Response) => {
+  try {
+    console.log('Getting all jobs');
+    const jobs = await getAllJobDetails();
+    res.json(jobs);
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json([]);
   }
 };

@@ -55,6 +55,8 @@ export const startScheduledJobs = async() => {
 export const scheduleAJob = (job: IScheduledJob) => {
   switch(job.type) {
   case EJobType.Weather:
+    // Run once, then on schedule.
+    weatherJob(job);
     scheduleJob(job.schedule, () => weatherJob(job));
     break;
   case EJobType.None:
