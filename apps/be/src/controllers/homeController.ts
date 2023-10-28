@@ -1,11 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
+/**
+ * @file Home controller.
+ */
+import { Request, Response } from 'express';
 
 /**
  * Handles the home route.
- * @param req - The request object.
- * @param res - The response object.
- * @param next - The next function.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
  */
-export const home = (req: Request, res: Response, next: NextFunction) => {
-    res.end('OK')
-}
+export const home = (req: Request, res: Response) => {
+  res.end('OK');
+};

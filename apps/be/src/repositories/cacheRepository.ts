@@ -11,8 +11,8 @@ let cache: NodeCache | null = null;
  * Initializes the cache with an infinite time-to-live and no check period.
  */
 export const initCache = () => {
-    cache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
-}
+  cache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
+};
 
 /**
  * Sets a value in the cache with the given key.
@@ -20,14 +20,12 @@ export const initCache = () => {
  * @param {T} value - The value to set in the cache.
  */
 export const setCache = <T>(key: string, value: T) => {
-    cache?.set(key, value);
-}
+  cache?.set(key, value);
+};
 
 /**
  * Retrieves the value associated with the specified key from the cache.
  * @param {string} key - The key of the value to retrieve.
  * @returns {T} The value associated with the specified key, or undefined if the key is not found in the cache.
  */
-export const getCache = <T>(key: string) => {
-    return cache?.get(key) as T;
-}
+export const getCache = <T>(key: string) => cache?.get(key) as T;

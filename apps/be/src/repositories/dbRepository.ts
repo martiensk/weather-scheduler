@@ -1,35 +1,38 @@
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
+/**
+ * @file This file contains the database repository.
+ */
+import sqlite3 from 'sqlite3';
+import { Database, open } from 'sqlite';
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
 /**
  * Opens or creates a SQLite database and sets up the necessary tables.
- * @returns Promise<void>
- * @throws Error if the database fails to initialize
+ * @returns Promise<void>.
+ * @throws Error if the database fails to initialize.
  */
-export const openOrCreateDb = async (): Promise<void> => {
-    // Open or create the database
-    db = await open({
-        filename: "./db.sqlite",
-        driver: sqlite3.Database,
+export const openOrCreateDb = async(): Promise<void> => {
+  // Open or create the database
+  db = await open({
+    filename: './db.sqlite',
+    driver: sqlite3.Database,
+  });
+
+  if(db) {
+
+    /**
+     * Close the database connection on SIGTERM.
+     * This allows the app to be gracefully shutdown.
+     * We keep a single connection open to the DB and recycle it for each request.
+     * This is a good compromise between performance and memory usage.
+     */
+    process.on('SIGTERM', () => {
+      db?.close();
     });
 
-    if(db) {
-
-        /**
-         * Close the database connection on SIGTERM.
-         * This allows the app to be gracefully shutdown.
-         * We keep a single connection open to the DB and recycle it for each request.
-         * This is a good compromise between performance and memory usage.
-         */
-        process.on('SIGTERM', () => {
-            db?.close();
-        });
-
-        // Create for job types
-        await db.run(`
+    // Create for job types
+    await db.run(`
             CREATE TABLE IF NOT EXISTS JobType (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 Type INTEGER NOT NULL,
@@ -37,70 +40,88 @@ export const openOrCreateDb = async (): Promise<void> => {
             );
         `);
 
-        // Create table for job schedules
-        await db.run(`
+    // Create table for job schedules
+    await db.run(`
             CREATE TABLE IF NOT EXISTS JobSchedule (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 TypeId INTEGER NOT NULL,
                 Schedule TEXT NOT NULL,
                 Details TEXT NOT NULL,
+                Active INTEGER NOT NULL DEFAULT 1,
                 FOREIGN KEY(TypeId) REFERENCES JobType(Id)
             );
         `);
 
-        // Checking if the DB is empty. If so, populate the schedule tables with some initial data.
-        const data = await db.all('SELECT * FROM JobType LIMIT 1');
-        if(data.length === 0) {
-            await populateDb();
-            console.log('Initial schedule data written to DB.');
-        }
-
-        return;
+    // Checking if the DB is empty. If so, populate the schedule tables with some initial data.
+    const data = await db.all('SELECT * FROM JobType LIMIT 1');
+    if(data.length === 0) {
+      await populateDb();
+      console.log('Initial schedule data written to DB.');
     }
 
-    throw new Error("Database not initialised");
+    return;
+  }
+
+  throw new Error('Database not initialised');
 };
 
 /**
  * Populates the database with initial data.
  * @throws {Error} If the database is not initialised.
  */
-const populateDb = async () => {
-    if (!db) {
-        throw new Error("Database not initialised");
-    }
+const populateDb = async() => {
+  if (!db) {
+    throw new Error('Database not initialised');
+  }
 
-    await db.run("INSERT INTO JobType (Type, Description) VALUES (?, ?)", [0, "None"]);
-    await db.run("INSERT INTO JobType (Type, Description) VALUES (?, ?)", [1, "Weather"]);
+  await db.run('INSERT INTO JobType (Type, Description) VALUES (?, ?)', [0, 'None']);
+  await db.run('INSERT INTO JobType (Type, Description) VALUES (?, ?)', [1, 'Weather']);
+
+  // Add one default job to get the Dublin weather every 5 minutes.
+  await db.run('INSERT INTO JobSchedule (TypeId, Details, Schedule) VALUES (?, ?, ?)', [1, JSON.stringify({ location: 'dublin-dublin-ireland' }), '*/5 * * * *']);
 };
 
 /**
  * Fetches all jobs from the database.
- * @throws {Error} If the database is not initialised.
  * @returns {Promise<IScheduledJob[]>} A promise that resolves to an array of job schedules.
+ * @throws {Error} If the database is not initialised.
  */
-export const fetchAllJobs = async () => {
-    if (!db) {
-        throw new Error("Database not initialised");
-    }
+export const fetchAllJobs = async() => {
+  if (!db) {
+    throw new Error('Database not initialised');
+  }
 
-    const data = await db.all(`
-        SELECT * FROM JobSchedule t2
-    `);
+  const data = await db.all('SELECT t2.Id as id, t2.TypeId as type, t2.Details as details, t2.Schedule as schedule FROM JobSchedule t2 where t2.Active = 1');
+  data.map((job) => {
+    job.details = JSON.parse(job.details);
+    return job;
+  });
+  console.log('Fetched jobs', data);
 
-    return data;
+  return data;
 };
 
 /**
  * Inserts a scheduled job into the database.
  * @param {IScheduledJob} job - The scheduled job to be inserted.
+ * @returns {Promise<number>} A promise that resolves to the id of the inserted job.
  * @throws An error if the database is not initialised.
  */
-export const insertJob = async (job: IScheduledJob) => {
-    if (!db) {
-        throw new Error("Database not initialised");
-    }
-    console.log('Inserting job');
+export const insertJob = async(job: IScheduledJob) => {
+  if (!db) {
+    throw new Error('Database not initialised');
+  }
+  console.log('Inserting job');
 
-    await db.run("INSERT INTO JobSchedule (TypeId, Details, Schedule) VALUES (?, ?, ?)", [job.type, job.details, job.schedule]);
-}
+  /**
+   * Technically we could use a job settings table here instead of storing job details as a string. It could be an intersection table between JobSchedule and JobSettingType.
+   * Or we could use a generic table with a key/value pair. The key would be the setting type and the value would be the setting value.
+   * In a real-world application I would probably do this, but for the purposes of this demo I'm just going to store the details as a string.
+   * Also worth noting that this is a parameterised query, so no need to worry about SQL injection.
+   */
+  const { lastID: table1Id } = await db.run('INSERT INTO JobSchedule (TypeId, Details, Schedule) VALUES (?, ?, ?)', [job.type, JSON.stringify(job.details), job.schedule]);
+  if(!table1Id) {
+    throw new Error('Failed to insert job');
+  }
+  return table1Id;
+};
