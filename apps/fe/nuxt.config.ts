@@ -1,3 +1,6 @@
+/**
+ * @file Nuxt.js configuration file.
+ */
 import runtimeConfig from './config.json';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config

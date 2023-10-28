@@ -3,7 +3,7 @@
  */
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { getAllScheduledJobs, saveJob } from '../services/schedulerService';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
 /**
  * Retrieves all scheduled jobs from cache or database and returns them as a JSON response.
@@ -29,10 +29,7 @@ export const getAllSchedules = async(req: Request, res: Response) => {
 export const addNewJob = async(req: Request, res: Response) => {
   try {
     const data = req.body as IScheduledJob;
-    console.log(data);
-
     await saveJob(data);
-
     res.json({ success: true });
   } catch (ex) {
     console.log(ex);

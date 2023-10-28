@@ -1,3 +1,6 @@
+/**
+ * @file Cache repository.
+ */
 import NodeCache from 'node-cache';
 
 /* 
@@ -17,7 +20,7 @@ export const initCache = () => {
 /**
  * Sets a value in the cache with the given key.
  * @param {string} key - The key to set the value under.
- * @param {T} value - The value to set in the cache.
+ * @param {unknown} value - The value to set in the cache.
  */
 export const setCache = <T>(key: string, value: T) => {
   cache?.set(key, value);
@@ -26,6 +29,6 @@ export const setCache = <T>(key: string, value: T) => {
 /**
  * Retrieves the value associated with the specified key from the cache.
  * @param {string} key - The key of the value to retrieve.
- * @returns {T} The value associated with the specified key, or undefined if the key is not found in the cache.
+ * @returns {unknown} The value associated with the specified key, or undefined if the key is not found in the cache.
  */
 export const getCache = <T>(key: string) => cache?.get(key) as T;

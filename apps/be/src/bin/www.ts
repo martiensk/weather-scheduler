@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
 /**
+ * @file The entry point for the backend application.
+ */
+
+/**
  * Module dependencies.
  */
 

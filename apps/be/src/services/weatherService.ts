@@ -1,7 +1,7 @@
 /**
  * @file This service is responsible for fetching weather data from the weather API.
  */
-import { IWeatherCurrent, IWeatherLocation } from 'shared-lib/src/interfaces/weather.interfaces.';
+import { IWeatherCurrent, IWeatherLocation } from 'shared-lib/src/interfaces/weather.interfaces';
 import axios from 'axios';
 
 const baseEndpoint = 'https://api.weatherapi.com/v1/';

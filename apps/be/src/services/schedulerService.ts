@@ -43,7 +43,6 @@ export const saveJob = async(job: IScheduledJob) => {
  */
 export const startScheduledJobs = async() => {
   const allJobs = await fetchAllJobs();
-  console.log('Starting scheduled jobs', allJobs);
   allJobs.forEach((job) => {
     scheduleAJob(job);
   });

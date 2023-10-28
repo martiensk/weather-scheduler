@@ -1,4 +1,8 @@
 /**
+ * @file Enum for cache keys used in the application.
+ */
+
+/**
  * Enum for cache keys used in the application.
  */
 export enum ECacheKeys {

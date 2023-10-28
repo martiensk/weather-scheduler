@@ -1,3 +1,6 @@
+/**
+ * @file Scheduler routes.
+ */
 import express from 'express';
 import * as schedulerController from '../controllers/schedulerController';
 

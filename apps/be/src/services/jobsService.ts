@@ -3,7 +3,7 @@
  */
 import { getCache, setCache } from '../repositories/cacheRepository';
 import { ECacheKeys } from '../enums/cacheKeys.enum';
-import { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces.';
+import { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces';
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { getWeather } from './weatherService';
 

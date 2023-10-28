@@ -9,7 +9,6 @@ let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
 /**
  * Opens or creates a SQLite database and sets up the necessary tables.
- * @returns Promise<void>.
  * @throws Error if the database fails to initialize.
  */
 export const openOrCreateDb = async(): Promise<void> => {
@@ -96,8 +95,6 @@ export const fetchAllJobs = async() => {
     job.details = JSON.parse(job.details);
     return job;
   });
-  console.log('Fetched jobs', data);
-
   return data;
 };
 

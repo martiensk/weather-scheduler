@@ -1,3 +1,7 @@
+/**
+ * @file Auth routes.
+ */
+
 import express, { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import querystring from 'querystring';
@@ -9,13 +13,13 @@ router.get('/login',
   passport.authenticate('auth0', { 
     scope: 'openid email profile'
   }), 
-  (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response) => {
     res.redirect('/');
   });
 
 router.get('/callback', 
   (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate('auth0', (err: Error, user: any, info: any) => {
+    passport.authenticate('auth0', (err: Error, user: any) => {
       if(err) {
         return next(err);
       }
@@ -42,7 +46,7 @@ router.get('/logout', (req: Request, res) => {
   const port = req.connection.localPort;
   
   if (port !== undefined && port !== 80 && port !== 443) {
-    returnTo =        process.env.NODE_ENV === 'production'          ? `${returnTo}/`          : `${returnTo}:${port}/`;
+    returnTo = process.env.NODE_ENV === 'production' ? `${returnTo}/` : `${returnTo}:${port}/`;
   }
   
   const logoutURL = new URL(`https://${process.env.AUTH0_DOMAIN}/v2/logout`);

@@ -1,3 +1,6 @@
+/**
+ * @file Home routes.
+ */
 import express from 'express';
 import * as homeController from '../controllers/homeController';
 

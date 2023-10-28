@@ -6,3 +6,8 @@
     <slot />
   </main>
 </template>
+<script setup lang="ts">
+/**
+ * @file Default layout.
+ */
+</script>

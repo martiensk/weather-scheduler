@@ -1,6 +1,8 @@
 <template>
-  <UButton>{{ getMsg() }}</UButton>
+  <UButton>Button</UButton>
 </template>
 <script setup lang="ts">
-import { getMsg } from 'shared-lib';
+/**
+ * @file Index.
+ */
 </script>

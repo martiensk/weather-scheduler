@@ -4,5 +4,7 @@
   </NuxtLayout>
 </template>
 <script setup lang="ts">
-// const config = useRuntimeConfig();
+/**
+ * @file App.
+ */
 </script>
