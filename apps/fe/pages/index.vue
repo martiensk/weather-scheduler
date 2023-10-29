@@ -2,10 +2,12 @@
 
   <UContainer class="grid grid-cols-3 grid-flow-row gap-4">
 
-    <WeatherCard
-      v-for="job in data"
-      :key="job.id"
-      :weather="job" />
+    <template v-for="job in data">
+      <WeatherCard
+        v-if="job.type === EJobType.WEATHER"
+        :key="job.id"
+        :weather="job" />
+    </template>
       
   </UContainer>
 
@@ -17,9 +19,11 @@
 import type { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { EWSSMessageType } from 'shared-lib/src/enums/wss.enums';
 import type { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces';
+import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 
 const config = useRuntimeConfig();
 const { data } = await useFetch<IScheduledJob[]>(`${config.public.apiBase}/scheduler/get-jobs`);
+const isAdmin = useState<boolean>('isAdmin', () => false);
 
 onMounted(() => {
   /*

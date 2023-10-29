@@ -20,7 +20,7 @@ export const getAllJobDetails = async() => {
   if(!allJobs) { return ([] as IScheduledJob[]); }
   allJobs.forEach((job) => {
     job.runs = [];
-    if(job.type === EJobType.Weather) {
+    if(job.type === EJobType.WEATHER) {
       const jobRunHistory =  getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
       if(jobRunHistory && jobRunHistory.length > 0) {
         job.runs =  getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);

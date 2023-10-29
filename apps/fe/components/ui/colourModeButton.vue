@@ -12,7 +12,7 @@
   </ClientOnly>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  * @file Colour mode button.
  */
