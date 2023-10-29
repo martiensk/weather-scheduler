@@ -1,5 +1,5 @@
 <template>
-  <UCard v-if="weather.lastRun && location && current">
+  <UCard v-if="reversedData.length && location && current">
   
     <template #header>
       <span>{{ location.name }}, </span>
@@ -53,7 +53,9 @@
         <UButton @click="isOpen = !isOpen">
           <UIcon name="i-heroicons-information-circle" /> More info...
         </UButton>
-        Last updated: {{ new Date(weather.lastRun.updated).toLocaleString() }}
+        <template v-if="lastUpdated">
+          Last updated: {{ new Date(lastUpdated).toLocaleString() }}
+        </template>
       </div>
     </template>
   </UCard>
@@ -72,21 +74,47 @@ const props = defineProps({
   },
 });
 
-const location = ref(props.weather.lastRun?.location);
-const current = ref(props.weather.lastRun?.current);
-
 const isOpen = ref(false);
 
-const tableData = ref([props.weather].map((item) => ({
-  Run: new Date(item.lastRun?.updated).toLocaleString(),
-  'Temp °C': item.lastRun?.current.temp_c,
-  'Feels like °C': item.lastRun?.current.feelslike_c,
-  'Wind km/h': item.lastRun?.current.wind_kph,
-  'Wind direction': item.lastRun?.current.wind_dir,
-  'Humidity %': item.lastRun?.current.humidity,
-  'Cloud %': item.lastRun?.current.cloud,
-  UV: item.lastRun?.current.uv,
-  'Visibility km': item.lastRun?.current.vis_km,
-  Condition: item.lastRun?.current.condition.text
-})));
+const reversedData = computed(() => {
+  if(!props.weather.runs?.length) { return []; }
+  return props.weather.runs.slice().reverse();
+});
+
+const location = computed(() => {
+  if (reversedData.value.length > 0) {
+    return reversedData.value[0].location;
+  }
+  return null;
+});
+
+const current = computed(() => {
+  if (reversedData.value.length > 0) {
+    return reversedData.value[0].current;
+  }
+  return null;
+});
+
+const lastUpdated = computed(() => {
+  if (reversedData.value.length > 0) {
+    return reversedData.value[0].updated;
+  }
+  return null;
+});
+
+/**
+ * This method has some weird type conversion thanks to typing in the UTable component from NuxtUI.
+ */
+const tableData = computed(() => reversedData.value.map((item) => ({
+  Run: new Date(item.updated).toLocaleString(),
+  'Temp °C': item.current.temp_c,
+  'Feels like °C': item.current.feelslike_c,
+  'Wind km/h': item.current.wind_kph,
+  'Wind direction': item.current.wind_dir,
+  'Humidity %': item.current.humidity,
+  'Cloud %': item.current.cloud,
+  UV: item.current.uv,
+  'Visibility km': item.current.vis_km,
+  Condition: item.current.condition.text
+})) as unknown as { [key: string]: any }[]);
 </script>

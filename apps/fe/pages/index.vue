@@ -25,12 +25,12 @@ onMounted(() => {
   /*
    * Listens to the event bus for updates on weather jobs and updates the last run time for the corresponding job in the data object.
    */
-  eventBus.listen(EWSSMessageType.WEATHER_JOB_UPDATE, (job: { jobId: number, weather: IWeatherCurrent}) => {
+  eventBus.listen(EWSSMessageType.WEATHER_JOB_UPDATE, (job: { jobId: number, weathers: IWeatherCurrent[]}) => {
     if(data.value) {
   
       data.value = data.value.map((j) => {
         if(j.id === job.jobId){
-          j.lastRun = job.weather;
+          j.runs = job.weathers;
         }
         return j;
       });

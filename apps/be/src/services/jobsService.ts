@@ -5,9 +5,10 @@ import { getCache, setCache } from '../repositories/cacheRepository';
 import { ECacheKeys } from '../enums/cacheKeys.enum';
 import { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces';
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
-import { getWeather } from './weatherService';
+import { getWeather } from '../repositories/weatherRepository';
 import { getAllScheduledJobs } from './schedulerService';
 import { sendMessage } from './socketService';
+import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 
 /**
  * Retrieves all scheduled job details and their last run history from cache.
@@ -18,17 +19,24 @@ export const getAllJobDetails = async() => {
 
   if(!allJobs) { return ([] as IScheduledJob[]); }
   allJobs.forEach((job) => {
-    const jobRunHistory = getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
-    let lastJobRun: IWeatherCurrent | undefined;
-    if(jobRunHistory && jobRunHistory.length > 0) {
-      lastJobRun = jobRunHistory[jobRunHistory.length - 1];
+    job.runs = [];
+    if(job.type === EJobType.Weather) {
+      const jobRunHistory =  getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
+      if(jobRunHistory && jobRunHistory.length > 0) {
+        job.runs =  getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
+      }
     }
-    job.lastRun = lastJobRun;
   });
 
   return allJobs;
 };
 
+/**
+ * This function is responsible for running a scheduled job that fetches weather data for a specific location.
+ * It retrieves historic weather data from cache, and updates it with the latest weather data for the location.
+ * The updated weather data is then sent to the front-end via WebSocket.
+ * @param {IScheduledJob} job - The scheduled job object containing the job details.
+ */
 export const weatherJob = async(job: IScheduledJob) => {
   console.log(`Running job ${job.id}`);
   // Get historic weathers from cache
@@ -88,16 +96,20 @@ export const weatherJob = async(job: IScheduledJob) => {
   // Update the cache
   setCache(`${ECacheKeys.WEATHER_JOB}_${job.id}`, cachedWeathers);
 
-  // Send the data to the front-end via WSS
+  /* 
+   * Send the data to the front-end via WSS
+   * I would prefer so send only the update here instead of all the historical data, 
+   * but since we have a max of 10 records the footprint is small enough to send it all.
+   * In a real world scenario I would send only the update and have the front-end request
+   * the historical data if needed.
+   */
   sendMessage(JSON.stringify({
     type: 'WEATHER_JOB_UPDATE',
     payload: {
       jobId: job.id,
-      weather: weatherUpdateObj
+      weathers: cachedWeathers
     }
   }));
   console.log(`Job ${job.id} completed`);
-
-  // TODO: Send the data to the front-end
 
 };

@@ -2,7 +2,7 @@
  * @file This file contains all the functions that are used to handle requests to the weather API.
  */
 
-import { getLocations } from '../services/weatherService';
+import { getLocations } from '../repositories/weatherRepository';
 import { Request, Response } from 'express';
 
 /**
