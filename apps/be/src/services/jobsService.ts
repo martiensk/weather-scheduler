@@ -7,6 +7,7 @@ import { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces';
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { getWeather } from './weatherService';
 import { getAllScheduledJobs } from './schedulerService';
+import { sendMessage } from './socketService';
 
 /**
  * Retrieves all scheduled job details and their last run history from cache.
@@ -48,7 +49,7 @@ export const weatherJob = async(job: IScheduledJob) => {
   // Get the weather for the location
   const weatherLookup = await getWeather(job.details.location);
 
-  cachedWeathers.push({
+  const weatherUpdateObj = {
     updated: new Date().toISOString(),
     location: {
       name: weatherLookup.location.name,
@@ -75,7 +76,9 @@ export const weatherJob = async(job: IScheduledJob) => {
       uv: weatherLookup.current.uv,
       gust_kph: weatherLookup.current.gust_kph
     }
-  });
+  };
+
+  cachedWeathers.push(weatherUpdateObj);
 
   /**
    * There is a requirement for the last 10 API requests results to be accessible by the front-end.
@@ -84,6 +87,15 @@ export const weatherJob = async(job: IScheduledJob) => {
 
   // Update the cache
   setCache(`${ECacheKeys.WEATHER_JOB}_${job.id}`, cachedWeathers);
+
+  // Send the data to the front-end via WSS
+  sendMessage(JSON.stringify({
+    type: 'WEATHER_JOB_UPDATE',
+    payload: {
+      jobId: job.id,
+      weather: weatherUpdateObj
+    }
+  }));
   console.log(`Job ${job.id} completed`);
 
   // TODO: Send the data to the front-end

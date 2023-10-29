@@ -7,4 +7,9 @@
 /**
  * @file App.
  */
+
+// Initialise websocket listener on client only
+if(process.client) {
+  initWSS();
+}
 </script>

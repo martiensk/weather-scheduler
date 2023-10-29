@@ -8,6 +8,7 @@
  * Module dependencies.
  */
 
+import { startWSS } from '../services/socketService';
 import app from '../server';
 import debug from 'debug';
 import http from 'http';
@@ -90,6 +91,9 @@ const server = http.createServer(app);
 
 server.listen(port);
 console.log(`Listening on port ${port}`);
+
+// We have to start WSS here because we need the server object to hook into the port.
+startWSS(server);
 server.on('error', onError);
 server.on('listening', onListening);
 

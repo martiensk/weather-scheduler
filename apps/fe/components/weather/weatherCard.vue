@@ -1,5 +1,6 @@
 <template>
   <UCard v-if="weather.lastRun && location && current">
+  
     <template #header>
       <span>{{ location.name }}, </span>
       <span v-if="location.region && location.name !== location.region">{{ location.region }}, </span>
@@ -48,7 +49,7 @@
     </UModal>
 
     <template #footer>
-      <div class="flex justify-between items-center text-sm">
+      <div class="flex justify-between items-center text-xs">
         <UButton @click="isOpen = !isOpen">
           <UIcon name="i-heroicons-information-circle" /> More info...
         </UButton>
@@ -56,6 +57,7 @@
       </div>
     </template>
   </UCard>
+
 </template>
 <script setup lang="ts">
 /**
