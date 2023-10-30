@@ -6,10 +6,6 @@ import runtimeConfig from './config.json';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxt/ui', '@nuxtjs/tailwindcss'],
-  tailwindcss: {
-    configPath: 'tailwind.config',
-    cssPath: false
-  },
+  modules: ['@nuxt/ui'],
   runtimeConfig
 });

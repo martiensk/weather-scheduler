@@ -119,6 +119,7 @@ module.exports = {
     'spaced-comment': ['warn', 'always', {
       markers: ['#region', '#endregion']
     }],
+    'no-case-declarations': 'off',
     //#endregion
     //#region Vue
     'vue/multi-word-component-names': 'off',

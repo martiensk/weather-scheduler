@@ -5,9 +5,16 @@ import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { deleteJob, fetchAllJobs, insertJob } from '../repositories/dbRepository';
 import { getCache, setCache } from '../repositories/cacheRepository';
 import { ECacheKeys } from '../enums/cacheKeys.enum';
-import { scheduleJob } from 'node-schedule';
+import { Job, scheduleJob } from 'node-schedule';
 import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 import { weatherJob } from './jobsService';
+
+/**
+ * Global object to store running jobs. This is used to cancel jobs when they are deleted.
+ * This is easier than to cache the jobs, as we can just grab the job from the global object and cancel it.
+ * @type {Record<string, Job>}
+ */
+const runningJobs = {} as Record<string, Job>;
 
 /**
  * Retrieves all scheduled jobs.
@@ -56,8 +63,9 @@ export const scheduleAJob = (job: IScheduledJob) => {
   switch(job.type) {
   case EJobType.WEATHER:
     // Run once, then on schedule.
-    weatherJob(job);
-    scheduleJob(job.schedule, () => weatherJob(job));
+    const scheduledJob = scheduleJob(job.schedule, () => weatherJob(job));
+    scheduledJob.invoke();
+    runningJobs[job.id] = scheduledJob;
     break;
   case EJobType.NONE:
   default:
@@ -66,6 +74,11 @@ export const scheduleAJob = (job: IScheduledJob) => {
   }
 };
 
+/**
+ * Deletes a scheduled job by its ID.
+ * @param {number} jobId - The ID of the job to delete.
+ * @throws If there is an error deleting the job from the database.
+ */
 export const deleteAJob = async(jobId: number) => {
   // Remove from DB
   try {
@@ -77,9 +90,14 @@ export const deleteAJob = async(jobId: number) => {
   // Remove from cache
   const allJobs = await getAllScheduledJobs();
   const jobToDelete = allJobs.find((job) => job.id === jobId);
+
   if(jobToDelete) {
     const index = allJobs.indexOf(jobToDelete);
     allJobs.splice(index, 1);
     setCache<IScheduledJob[]>(ECacheKeys.SCHEDULED_JOBS, allJobs);
+
+    // Cancel the job
+    runningJobs[jobId].cancel();
+    delete runningJobs[jobId];
   }
 };

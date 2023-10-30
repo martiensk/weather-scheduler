@@ -2,7 +2,7 @@
  * @file Controller for the scheduler routes.
  */
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
-import { getAllScheduledJobs, saveJob } from '../services/schedulerService';
+import { getAllScheduledJobs, saveJob, deleteAJob } from '../services/schedulerService';
 import { getAllJobDetails } from './../services/jobsService';
 import { Request, Response } from 'express';
 
@@ -54,5 +54,22 @@ export const getAllJobs = async(req: Request, res: Response) => {
   } catch (ex) {
     console.log(ex);
     res.status(500).json([]);
+  }
+};
+
+/**
+ * Deletes a job with the given ID from the scheduler.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {object} A JSON object indicating whether the operation was successful.
+ */
+export const deleteJob = async(req: Request, res: Response) => {
+  try {
+    const jobId = req.body.id;
+    await deleteAJob(jobId);
+    res.json({ success: true });
+  } catch(ex) {
+    console.log(ex);
+    res.status(500).json({ success: false });
   }
 };

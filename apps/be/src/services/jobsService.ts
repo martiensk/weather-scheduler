@@ -113,10 +113,11 @@ export const weatherJob = async(job: IScheduledJob) => {
   sendMessage(JSON.stringify({
     type: 'WEATHER_JOB_UPDATE',
     payload: {
-      jobId: job.id,
-      weathers: cachedWeathers
+      ...job,
+      runs: cachedWeathers
     }
   }));
+
   console.log(`Job ${job.id} completed`);
 
 };

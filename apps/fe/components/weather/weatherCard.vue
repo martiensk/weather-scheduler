@@ -6,7 +6,8 @@
     <UIcon
       v-if="isAdmin"
       name="i-heroicons-trash"
-      class="absolute top-2 right-2 text-red-400 font-bold cursor-pointer" />
+      class="absolute top-2 right-2 text-red-400 font-bold cursor-pointer"
+      @click="deleteJob" />
   
     <template #header>
       <span>{{ location.name }}, </span>
@@ -34,6 +35,7 @@
       v-model="isOpen"
       fullscreen>
       <UCard class="rounded-none divide-y divide-gray-100 dark:divide-gray-800 h-full">
+
         <template #header>
           <div class="flex justify-between items-center">
             <span>
@@ -41,24 +43,30 @@
               <template v-if="location.region && location.name !== location.region">{{ location.region }}, </template>
               {{ location.country }}
             </span>
+
             <UButton
               color="gray"
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
               @click="isOpen = false" />
+
           </div>
         </template>
+
         <UTable
           class="grow"
           :rows="tableData" />
+
       </UCard>
     </UModal>
 
-    <div class="w-full h-full absolute top-0 left-0 bg-white/50 flex items-center justify-center">
+    <div
+      v-if="loading"
+      class="w-full h-full absolute top-0 left-0 bg-white/50 flex items-center justify-center backdrop-blur-sm">
       <UIcon
         name="i-heroicons-arrow-path"
-        class="text-xl text-gray-800 font-bold animate-spin" />
+        class="text-4xl text-gray-800 font-bold animate-spin" />
     </div>
 
     <template #footer>
@@ -66,7 +74,7 @@
         <UButton
           class="mr-3"
           @click="isOpen = !isOpen">
-          <UIcon name="i-heroicons-information-circle" /> More info...
+          More info...
         </UButton>
         <template v-if="lastUpdated">
           Last updated: {{ new Date(lastUpdated).toLocaleString() }}
@@ -92,6 +100,7 @@ const emit = defineEmits(['delete:weather']);
 
 const isAdmin = useState<boolean>('isAdmin', () => false);
 const isOpen = ref(false);
+const loading = ref(false);
 
 const reversedData = computed(() => {
   if(!props.weather.runs?.length) { return []; }
@@ -136,16 +145,47 @@ const tableData = computed(() => reversedData.value.map((item) => ({
 })) as unknown as { [key: string]: any }[]);
 
 const deleteJob = async() => {
-  const config = useRuntimeConfig();
-  const { data } = await useFetch(`${config.public.apiBase}/scheduler/delete-job`, {
-    method: 'POST',
-    body: JSON.stringify({
-      id: props.weather.id
-    })
-  });
-  console.log(data.value);
-  if(data) {
-    emit('delete:weather', props.weather.id);
+  loading.value = true;
+  const toast = useToast();
+  try {
+    const config = useRuntimeConfig();
+    const { data } = await useFetch(`${config.public.apiBase}/scheduler/delete-job`, {
+      method: 'POST',
+      body: JSON.stringify({
+        id: props.weather.id
+      })
+    });
+  
+    if((data.value as { success: boolean }).success) {
+      emit('delete:weather', props.weather.id);
+
+      toast.add({
+        id: 'delete_weather_success',
+        title: 'Success!',
+        description: 'Weather job deleted successfully.',
+        icon: 'i-heroicons-check',
+        timeout: 2000,
+        color: 'green',
+        actions: []
+      });
+      return;
+    }
+
+    throw new Error('No data returned from API.');
+    
+  } catch (error) {
+    console.error(error);
+    toast.add({
+      id: 'delete_weather_failed',
+      title: 'Error!',
+      description: 'There was a problem deleting the weather job.',
+      icon: 'i-heroicons-x-mark',
+      timeout: 5000,
+      color: 'red',
+      actions: []
+    });
+  } finally {
+    loading.value = false;
   }
 };
 </script>
