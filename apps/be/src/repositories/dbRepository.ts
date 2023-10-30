@@ -122,3 +122,18 @@ export const insertJob = async(job: IScheduledJob) => {
   }
   return table1Id;
 };
+
+/**
+ * Deletes a scheduled job from the database.
+ * @param {number} jobId - The id of the job to be deleted.
+ * @returns {Promise<void>}
+ * @throws An error if the database is not initialised.
+ */
+export const deleteJob = async(jobId: number) => {
+  if (!db) {
+    throw new Error('Database not initialised');
+  }
+  console.log('Deleting job');
+
+  await db.run('UPDATE JobSchedule SET Active = 0 WHERE Id = ?', [jobId]);
+};

@@ -2,7 +2,7 @@
  * @file This file contains the scheduler service.
  */
 import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
-import { fetchAllJobs, insertJob } from '../repositories/dbRepository';
+import { deleteJob, fetchAllJobs, insertJob } from '../repositories/dbRepository';
 import { getCache, setCache } from '../repositories/cacheRepository';
 import { ECacheKeys } from '../enums/cacheKeys.enum';
 import { scheduleJob } from 'node-schedule';
@@ -63,5 +63,23 @@ export const scheduleAJob = (job: IScheduledJob) => {
   default:
     console.log(`No job type specified for job ${job}`);
     break;
+  }
+};
+
+export const deleteAJob = async(jobId: number) => {
+  // Remove from DB
+  try {
+    await deleteJob(jobId);
+  } catch (ex) {
+    console.log(ex);
+    throw ex;
+  }
+  // Remove from cache
+  const allJobs = await getAllScheduledJobs();
+  const jobToDelete = allJobs.find((job) => job.id === jobId);
+  if(jobToDelete) {
+    const index = allJobs.indexOf(jobToDelete);
+    allJobs.splice(index, 1);
+    setCache<IScheduledJob[]>(ECacheKeys.SCHEDULED_JOBS, allJobs);
   }
 };

@@ -1,6 +1,6 @@
 <template>
 
-  <UContainer class="grid grid-cols-3 grid-flow-row gap-4">
+  <UContainer class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4 lg:grid-cols-3 justify-items-center">
 
     <template v-for="job in data">
       <WeatherCard

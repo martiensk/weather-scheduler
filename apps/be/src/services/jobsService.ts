@@ -55,7 +55,14 @@ export const weatherJob = async(job: IScheduledJob) => {
   }
 
   // Get the weather for the location
-  const weatherLookup = await getWeather(job.details.location);
+  let weatherLookup: IWeatherCurrent | null = null;
+  try {
+    weatherLookup = await getWeather(job.details.location);
+  } catch {
+    console.log(`Job ${job.id} failed`);
+    // Normally we would log the error here, but since we don't have a logger in this project, we'll just console.log it.
+    return;
+  }
 
   const weatherUpdateObj = {
     updated: new Date().toISOString(),

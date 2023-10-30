@@ -1,5 +1,12 @@
 <template>
-  <UCard v-if="reversedData.length && location && current">
+  <UCard
+    v-if="reversedData.length && location && current"
+    class="min-w-[300px] max-w-[400px] relative">
+
+    <UIcon
+      v-if="isAdmin"
+      name="i-heroicons-trash"
+      class="absolute top-2 right-2 text-red-400 font-bold cursor-pointer" />
   
     <template #header>
       <span>{{ location.name }}, </span>
@@ -48,9 +55,17 @@
       </UCard>
     </UModal>
 
+    <div class="w-full h-full absolute top-0 left-0 bg-white/50 flex items-center justify-center">
+      <UIcon
+        name="i-heroicons-arrow-path"
+        class="text-xl text-gray-800 font-bold animate-spin" />
+    </div>
+
     <template #footer>
       <div class="flex justify-between items-center text-xs">
-        <UButton @click="isOpen = !isOpen">
+        <UButton
+          class="mr-3"
+          @click="isOpen = !isOpen">
           <UIcon name="i-heroicons-information-circle" /> More info...
         </UButton>
         <template v-if="lastUpdated">
@@ -73,7 +88,9 @@ const props = defineProps({
     required: true,
   },
 });
+const emit = defineEmits(['delete:weather']);
 
+const isAdmin = useState<boolean>('isAdmin', () => false);
 const isOpen = ref(false);
 
 const reversedData = computed(() => {
@@ -117,4 +134,18 @@ const tableData = computed(() => reversedData.value.map((item) => ({
   'Visibility km': item.current.vis_km,
   Condition: item.current.condition.text
 })) as unknown as { [key: string]: any }[]);
+
+const deleteJob = async() => {
+  const config = useRuntimeConfig();
+  const { data } = await useFetch(`${config.public.apiBase}/scheduler/delete-job`, {
+    method: 'POST',
+    body: JSON.stringify({
+      id: props.weather.id
+    })
+  });
+  console.log(data.value);
+  if(data) {
+    emit('delete:weather', props.weather.id);
+  }
+};
 </script>
