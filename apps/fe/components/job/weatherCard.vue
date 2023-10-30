@@ -1,7 +1,7 @@
 <template>
   <UCard
     v-if="reversedData.length && location && current"
-    class="min-w-[300px] max-w-[400px] relative">
+    class="min-w-[300px] relative">
 
     <UIcon
       v-if="isAdmin"
