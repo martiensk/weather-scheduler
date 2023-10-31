@@ -2,7 +2,7 @@
   <div class="relative">
     <UInput
       :model-value="countrySearch"
-      class="inline-block"
+      class="w-100"
       :loading="countriesLoading"
       placeholder="Search..."
       :color="dirty && !modelValue ? 'red' : 'white'"
@@ -14,11 +14,11 @@
     <transition name="fade">
       <ul
         v-if="selectCountryOptions.length && countryHasFocus"
-        class="ul absolute left-0 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900">
+        class="ul absolute left-0 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 z-10 w-full">
         <li
           v-for="option in selectCountryOptions"
           :key="option.value"
-          class="cursor-pointer hover:bg-primary my-0.5 px-2"
+          :class="[option.value ? 'cursor-pointer hover:bg-primary' : '', 'my-0.5 px-2']"
           @click="selectCountry(option.value)">
           {{ option.name }}
         </li>
@@ -28,11 +28,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { IWeatherLocation } from 'shared-lib/src/interfaces/weather.interfaces';
-
 /**
  * @file A component to look up a country from the weather API.
  */
+
+import type { IWeatherLocation } from 'shared-lib/src/interfaces/weather.interfaces';
 
 const props = defineProps({
   modelValue: {
@@ -78,12 +78,16 @@ const doInputMonitoring = () => {
 };
 
 const getCountries = async() => {
+  if(!countrySearch.value) { return; }
   const { data } = await useFetch<IWeatherLocation[]>(`${config.public.apiBase}/weather/search?q=${countrySearch.value}`);
   if(data.value) {
     selectCountryOptions.value = [];
+    if(!data.value.length) {
+      selectCountryOptions.value.push({ name: 'No results found.', value: '' });
+    }
     data.value.forEach((location) => {
       selectCountryOptions.value.push({ 
-        name: `${location.name},${location.region && location.region !== location.name ? `${location.region} ,`: ''} ${location.country}`, 
+        name: `${location.name}, ${location.region && location.region !== location.name ? `${location.region},`: ''} ${location.country}`, 
         value: location.url
       });
     });
@@ -91,6 +95,7 @@ const getCountries = async() => {
 };
 
 const selectCountry = (id: string) => {
+  if(!id) { return; }
   if(selectCountryOptions.value.length) {
     const country = selectCountryOptions.value.find((c) => c.value === id);
     if(country) {

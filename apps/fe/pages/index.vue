@@ -16,13 +16,32 @@
         @delete:weather="deleteJob" />
     </template>
 
-    <JobAddJobCard />
+    <UCard
+      v-if="isAdmin"
+      class="w-[300px] max-w-[400px] relative overflow-visible flex justify-center items-center cursor-pointer group"
+      @click="isAddJobModalOpen = true">
+      <UIcon
+        class="text-6xl scale-125 group-hover:scale-150 transition-all duration-300 ease-in-out"
+        name="i-heroicons-plus" />
+    </UCard>
+
+    <UModal
+      v-model="isAddJobModalOpen"
+      :ui="{
+        'header': {
+          padding: 'text-xl font-bold'
+        }
+      }"
+      prevent-close>
+      <JobAddJobCard
+        @close="isAddJobModalOpen = false" />
+    </UModal>
       
   </UContainer>
 
 </template>
 <script setup lang="ts">
-/**
+/** 
  * @file Index.
  */
 import type { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
@@ -32,6 +51,7 @@ import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 const config = useRuntimeConfig();
 const { data } = await useFetch<IScheduledJob[]>(`${config.public.apiBase}/scheduler/get-jobs`);
 const isAdmin = useState<boolean>('isAdmin', () => false);
+const isAddJobModalOpen = ref(false);
 
 const deleteJob = (id: number) => {
   if(isAdmin.value && data.value) {

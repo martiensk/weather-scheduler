@@ -1,31 +1,43 @@
 <template>
-  <UCard class="w-[300px] max-w-[400px] relative overflow-visible">
+  <UCard class="relative overflow-visible ring-0">
 
     <template #header>
-      Add a <span class="lowercase">{{ EJobType[selectedJob] }}</span> job.
+      <div class="flex justify-between items-center">
+        <span>Add a <span class="lowercase">{{ EJobType[selectedJob] }}</span> job.</span>
+
+        <UButton
+          color="gray"
+          variant="ghost"
+          icon="i-heroicons-x-mark-20-solid"
+          class="-my-1"
+          @click="$emit('close')" />
+      </div>
     </template>
 
-    <div class="grid grid-cols-2 gap-2 items-center">
+    <div class="flex flex-col">
       
-      <span class="pr-2">Select a Job:</span>
+      <span class="mb-1">Select a Job:</span>
       <USelect
         v-model="selectedJob"
-        class="inline-block"
         :options="selectJobOptions"
         option-attribute="name" />
 
       <template v-if="selectedJob === EJobType.WEATHER">
-        <span class="pr-2">Select a Country:</span>
+        <span class="mb-1 mt-4">Select a Country:</span>
         <JobWeatherLocationSelect
           v-model="selectedCountry" />
       </template>
 
-      <span class="pr-2">Select a Schedule:</span>
-      <USelect
-        v-model="selectedSchedule"
-        class="inline-block"
-        :options="selectScheduleOptions"
-        option-attribute="name" />
+      <span class="mb-1 mt-4">Select a Schedule:</span>
+      <JobSchedule v-model="selectedSchedule" />
+
+      <UButton
+        class="mt-4 justify-center"
+        :loading="saving"
+        :disabled="valid"
+        @click="save">
+        Save Job
+      </UButton>
 
     </div>
 
@@ -38,14 +50,29 @@
 
 import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 
+const emit = defineEmits(['close']);
+
 const selectJobOptions = [{ name: 'Weather', value: EJobType.WEATHER }];
 const selectedJob = ref(EJobType.WEATHER);
 
-const selectScheduleOptions = [
-  { code: 'XMinutes', name: 'Every X Minutes' },
-  { code: 'XHours', name: 'Every X Hours' },
-  { code: 'Schedule', name: 'Schedule' }
-];
-const selectedSchedule = ref(selectScheduleOptions[0].code);
 const selectedCountry = ref('');
+const selectedSchedule = ref('');
+
+const saving = ref(false);
+
+const valid = computed(() => (Boolean(!selectedJob.value || !selectedCountry.value || !selectedSchedule.value)));
+
+const save = () => {
+  saving.value = true;
+  const payload = {
+    type: selectedJob.value,
+    country: selectedCountry.value,
+    schedule: selectedSchedule.value
+  };
+  console.log('payload', payload);
+  setTimeout(() => {
+    saving.value = false;
+    emit('close');
+  }, 1000);
+};
 </script>
