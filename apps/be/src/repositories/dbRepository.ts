@@ -91,8 +91,8 @@ export const fetchAllJobs = async() => {
   }
 
   const data = await db.all('SELECT t2.Id as id, t2.TypeId as type, t2.Details as details, t2.Schedule as schedule FROM JobSchedule t2 where t2.Active = 1');
-  data.map((job) => {
-    job.details = JSON.parse(job.details);
+  (data as IScheduledJob[]).map((job) => {
+    job.details = JSON.parse(job.details as unknown as string);
     return job;
   });
   return data;

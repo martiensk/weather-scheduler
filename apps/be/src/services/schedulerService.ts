@@ -23,7 +23,6 @@ const runningJobs = {} as Record<string, Job>;
 export const getAllScheduledJobs = async() => {
   // Try grab from cache
   let allJobs: IScheduledJob[] = getCache<IScheduledJob[]>(ECacheKeys.SCHEDULED_JOBS);
-  console.log(allJobs);
   if(!allJobs) {
     allJobs = await fetchAllJobs();
     setCache<IScheduledJob[]>(ECacheKeys.SCHEDULED_JOBS, allJobs);
@@ -62,9 +61,18 @@ export const startScheduledJobs = async() => {
 export const scheduleAJob = (job: IScheduledJob) => {
   switch(job.type) {
   case EJobType.WEATHER:
-    // Run once, then on schedule.
-    const scheduledJob = scheduleJob(job.schedule, () => weatherJob(job));
-    scheduledJob.invoke();
+    const scheduledJob = scheduleJob(job.schedule, () => {
+      try {
+        weatherJob(job);
+      } catch (ex) {
+        console.log(ex);
+      }
+    });
+    try {
+      scheduledJob.invoke();
+    } catch (ex) {
+      console.log(ex);
+    }
     runningJobs[job.id] = scheduledJob;
     break;
   case EJobType.NONE:

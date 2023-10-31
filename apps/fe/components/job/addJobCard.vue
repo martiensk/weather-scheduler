@@ -62,17 +62,51 @@ const saving = ref(false);
 
 const valid = computed(() => (Boolean(!selectedJob.value || !selectedCountry.value || !selectedSchedule.value)));
 
-const save = () => {
+const save = async() => {
   saving.value = true;
-  const payload = {
-    type: selectedJob.value,
-    country: selectedCountry.value,
-    schedule: selectedSchedule.value
-  };
-  console.log('payload', payload);
-  setTimeout(() => {
+  const toast = useToast();
+  const config = useRuntimeConfig();
+
+  try {
+    const { data } = await useFetch(`${config.public.apiBase}/scheduler/add`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: selectedJob.value,
+        details: { location: selectedCountry.value }, // Obviously needs to be calculated if we add more job types.
+        schedule: selectedSchedule.value
+      })
+    });
+
+    if((data.value as { success: boolean }).success) {
+
+      toast.add({
+        id: 'add_weather_success',
+        title: 'Success!',
+        description: 'Weather job created.',
+        icon: 'i-heroicons-check',
+        timeout: 2000,
+        color: 'green',
+        actions: []
+      });
+
+      emit('close');
+
+      return;
+    }
+
+    throw new Error('No data returned from API.');
+  } catch (err) {
+    console.error(err);
     saving.value = false;
-    emit('close');
-  }, 1000);
+    toast.add({
+      id: 'add_weather_failed',
+      title: 'Error!',
+      description: 'There was a problem creating the weather job.',
+      icon: 'i-heroicons-x-mark',
+      timeout: 5000,
+      color: 'red',
+      actions: []
+    });
+  }
 };
 </script>

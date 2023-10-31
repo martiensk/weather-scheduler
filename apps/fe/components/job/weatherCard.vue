@@ -147,6 +147,7 @@ const tableData = computed(() => reversedData.value.map((item) => ({
 const deleteJob = async() => {
   loading.value = true;
   const toast = useToast();
+
   try {
     const config = useRuntimeConfig();
     const { data } = await useFetch(`${config.public.apiBase}/scheduler/delete-job`, {
@@ -174,6 +175,7 @@ const deleteJob = async() => {
     throw new Error('No data returned from API.');
     
   } catch (error) {
+
     console.error(error);
     toast.add({
       id: 'delete_weather_failed',
@@ -184,6 +186,7 @@ const deleteJob = async() => {
       color: 'red',
       actions: []
     });
+    
   } finally {
     loading.value = false;
   }

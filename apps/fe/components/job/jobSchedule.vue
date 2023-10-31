@@ -49,7 +49,8 @@
       </div>
     </template>
 
-    <hr class="my-4">
+    <!-- <hr class="my-4"> -->
+    <UDivider class="my-4" />
 
     <p>{{ displayText }}</p>
 
@@ -80,7 +81,7 @@ const daySelectOptions = ref<{[key:string]: { value: number, selected: boolean, 
   Th: { value: 4, selected: true, name: 'Thursday' },
   Fr: { value: 5, selected: true, name: 'Friday' },
   Sa: { value: 6, selected: true, name: 'Saturday' },
-  Su: { value: 0, selected: true, name: 'Sunday' }
+  Su: { value: 7, selected: true, name: 'Sunday' }
 });
 
 const selectedSchedule = ref(selectScheduleOptions[0].value);
@@ -151,7 +152,7 @@ const updateSchedule = () => {
       .filter((day) => day.selected)
       .map((day) => day.value)
       .join(',');
-    schedule =  `${time[0]} ${time[1]} * * ${days}`;
+    schedule =  `${time[1]} ${time[0]} * * ${days}`;
     break;
   default:
     break;
