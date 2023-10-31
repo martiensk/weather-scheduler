@@ -52,16 +52,41 @@ import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 
 const emit = defineEmits(['close']);
 
+//#region Properties
+/**
+ * An array of select options for a job type dropdown menu.
+ */
 const selectJobOptions = [{ name: 'Weather', value: EJobType.WEATHER }];
+/**
+ * Keeps track of the currently selected job type.
+ */
 const selectedJob = ref(EJobType.WEATHER);
-
+/**
+ * The selected country for the job being added.
+ */
 const selectedCountry = ref('');
+/**
+ * The selected schedule for the job being added.
+ */
 const selectedSchedule = ref('');
 
+/**
+ * A reactive variable that indicates whether a job is currently being saved.
+ */
 const saving = ref(false);
+//#endregion
 
+/**
+ * Computed property that checks if the selected job, country, and schedule are all truthy.
+ */
 const valid = computed(() => (Boolean(!selectedJob.value || !selectedCountry.value || !selectedSchedule.value)));
 
+/**
+ * Saves the job by sending a POST request to the API with the selected job type, country, and schedule.
+ * Shows a success toast message and emits a 'close' event if the job is successfully created.
+ * Shows an error toast message if there is a problem creating the job.
+ * @async
+ */
 const save = async() => {
   saving.value = true;
   const toast = useToast();

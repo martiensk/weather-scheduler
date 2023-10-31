@@ -98,15 +98,33 @@ const props = defineProps({
 });
 const emit = defineEmits(['delete:weather']);
 
+//#region Properties
+/**
+ * Nuxt state to determine if the user is an admin or not.
+ */
 const isAdmin = useState<boolean>('isAdmin', () => false);
+/**
+ * Indicates whether the weather card is open or closed.
+ */
 const isOpen = ref(false);
+/**
+ * Indicates whether the component is currently loading or not.
+ */
 const loading = ref(false);
+//#endregion
 
+//#region Computed
+/**
+ * Computed property that returns the reversed array of weather runs.
+ */
 const reversedData = computed(() => {
   if(!props.weather.runs?.length) { return []; }
   return props.weather.runs.slice().reverse();
 });
 
+/**
+ * Computed property that returns the location property of the first item in the reversedData array.
+ */
 const location = computed(() => {
   if (reversedData.value.length > 0) {
     return reversedData.value[0].location;
@@ -114,6 +132,9 @@ const location = computed(() => {
   return null;
 });
 
+/**
+ * Computed property that returns the current property of the first item in the reversedData array.
+ */
 const current = computed(() => {
   if (reversedData.value.length > 0) {
     return reversedData.value[0].current;
@@ -121,6 +142,9 @@ const current = computed(() => {
   return null;
 });
 
+/**
+ * Computed property that returns the last updated value of the first item in the reversedData array.
+ */
 const lastUpdated = computed(() => {
   if (reversedData.value.length > 0) {
     return reversedData.value[0].updated;
@@ -129,7 +153,8 @@ const lastUpdated = computed(() => {
 });
 
 /**
- * This method has some weird type conversion thanks to typing in the UTable component from NuxtUI.
+ * This computed property has some weird type conversion thanks to typing in the UTable component from NuxtUI.
+ * It returns the table data for the UTable component.
  */
 const tableData = computed(() => reversedData.value.map((item) => ({
   Run: new Date(item.updated).toLocaleString(),
@@ -143,7 +168,12 @@ const tableData = computed(() => reversedData.value.map((item) => ({
   'Visibility km': item.current.vis_km,
   Condition: item.current.condition.text
 })) as unknown as { [key: string]: any }[]);
+//#endregion
 
+/**
+ * Deletes a weather job using the API endpoint.
+ * @async
+ */
 const deleteJob = async() => {
   loading.value = true;
   const toast = useToast();

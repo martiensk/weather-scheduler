@@ -3,9 +3,9 @@
  */
 
 /**
- * Provides global event registration similar to what the EventBus did in Vue 2.
+ * Provides global event registration as a singleton..
+ * @returns {object} An object with methods to listen, off, and emit events.
  */
-
 const createEventBus = () => {
   /**
    * A container to hold registered events.

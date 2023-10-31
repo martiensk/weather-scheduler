@@ -48,17 +48,44 @@ import type { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
 import { EWSSMessageType } from 'shared-lib/src/enums/wss.enums';
 import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 
+//#region Properties
 const config = useRuntimeConfig();
-const { data } = await useFetch<IScheduledJob[]>(`${config.public.apiBase}/scheduler/get-jobs`);
-const isAdmin = useState<boolean>('isAdmin', () => false);
-const isAddJobModalOpen = ref(false);
 
-const deleteJob = (id: number) => {
+/**
+ * This code fetches scheduled jobs from the API endpoint using the useFetch hook and stores the response data in the 'data' variable.
+ */
+const { data } = await useFetch<IScheduledJob[]>(`${config.public.apiBase}/scheduler/get-jobs`);
+
+/**
+ * Defines a boolean state variable 'isAdmin' with an initial value of false.
+ * The state variable can be accessed and updated using the 'useState' hook.
+ */
+const isAdmin = useState<boolean>('isAdmin', () => false);
+
+/**
+ * A reactive variable that determines whether the "Add Job" modal is currently open or not.
+ * @type {object}
+ */
+const isAddJobModalOpen = ref(false);
+//#endregion
+
+//#region Methods
+/**
+ * Deletes a job with the given id from the data array if the user is an admin and data is not null.
+ * @param {number} id - The id of the job to be deleted.
+ */
+const deleteJob = (id: number): void => {
   if(isAdmin.value && data.value) {
     data.value = data.value.filter((j) => j.id !== id);
   }
 };
 
+/**
+ * Updates the scheduled job with the given job object.
+ * If the job already exists in the data array, it updates the runs property.
+ * If the job does not exist in the data array, it adds the job to the array.
+ * @param {IScheduledJob} job - The job object to update or add.
+ */
 const doJobUpdate = (job: IScheduledJob) => {
   if(data.value) {
   
@@ -78,7 +105,9 @@ const doJobUpdate = (job: IScheduledJob) => {
 
   }
 };
+//#endregion
 
+//#region Lifecycle hooks
 onMounted(() => {
   /*
    * Listens to the event bus for updates on weather jobs and updates the last run time for the corresponding job in the data object.
@@ -90,4 +119,5 @@ onBeforeUnmount(() => {
   // Preventing memory leaks :)
   eventBus.off(EWSSMessageType.WEATHER_JOB_UPDATE, doJobUpdate);
 });
+//#endregion
 </script>

@@ -49,7 +49,6 @@
       </div>
     </template>
 
-    <!-- <hr class="my-4"> -->
     <UDivider class="my-4" />
 
     <p>{{ displayText }}</p>
@@ -69,11 +68,18 @@ defineProps({
 });
 const emit = defineEmits(['update:modelValue']);
 
+//#region Properties
+/**
+ * An array of objects representing the options for selecting a job schedule.
+ */
 const selectScheduleOptions = [
   { value: 'XMinutes', name: 'Every X Minutes' },
   { value: 'XHours', name: 'Every X Hours' },
   { value: 'Schedule', name: 'On a Schedule' }
 ];
+/**
+ * An object containing the options for selecting days of the week in the job schedule component.
+ */
 const daySelectOptions = ref<{[key:string]: { value: number, selected: boolean, name: string }}>({
   Mo: { value: 1, selected: true, name: 'Monday' },
   Tu: { value: 2, selected: true, name: 'Tuesday' },
@@ -83,19 +89,34 @@ const daySelectOptions = ref<{[key:string]: { value: number, selected: boolean, 
   Sa: { value: 6, selected: true, name: 'Saturday' },
   Su: { value: 7, selected: true, name: 'Sunday' }
 });
-
+/**
+ * The currently selected schedule for the job.
+ */
 const selectedSchedule = ref(selectScheduleOptions[0].value);
+/**
+ * The interval variable represents the time interval (in minutes) between job executions.
+ */
 const interval = ref(5);
+/**
+ * An object containing config details for the slider component.
+ */
 const sliderDetails = ref({
   min: 5,
   max: 60,
   step: 5
 });
+/**
+ * An object containing details about the schedule.
+ */
 const scheduleDetails = ref({
   time: '13:30',
   days: []
 });
+//#endregion
 
+/**
+ * Computed property that returns the display text for the job schedule.
+ */
 const displayText = computed(() => {
   let text = `The job will ruin every ${interval.value} ${selectedSchedule.value === 'XMinutes' ? 'minutes' : 'hours'}.`;
   if(selectedSchedule.value === 'Schedule') {
@@ -108,6 +129,12 @@ const displayText = computed(() => {
   return text;
 });
 
+//#region Methods
+
+/**
+ * Updates the selected schedule and slider details based on the given value.
+ * @param {string} value - The value to update the selected schedule with.
+ */
 const updateScheduleSelection = (value: string) => {
   selectedSchedule.value = value;
 
@@ -130,11 +157,19 @@ const updateScheduleSelection = (value: string) => {
   updateSchedule();
 };
 
+/**
+ * Updates the schedule interval with the given value and triggers an update of the schedule.
+ * @param {number} value - The new value for the schedule interval.
+ */
 const updateScheduleInterval = (value: number) => {
   interval.value = value;
   updateSchedule();
 };
 
+/**
+ * Updates the schedule based on the selected schedule type and interval/time/schedule details.
+ * Emits an 'update:modelValue' event with the updated schedule.
+ */
 const updateSchedule = () => {
 
   let schedule = '';
@@ -161,16 +196,25 @@ const updateSchedule = () => {
   emit('update:modelValue', schedule);
 };
 
+/**
+ * Sets the time for the job schedule.
+ * @param {Event} evt - The input even.
+ */
 const setTime = (evt: Event) => {
   const time = (evt.target as HTMLInputElement)?.value;
   scheduleDetails.value.time = time;
   updateSchedule();
 };
 
+/**
+ * Toggles the selected state of a day in the daySelectOptions object and updates the schedule.
+ * @param {string} day - The day to toggle.
+ */
 const toggleDay = (day: string) => {
   daySelectOptions.value[day].selected = !daySelectOptions.value[day].selected;
   updateSchedule();
 };
+//#endregion
 
 onMounted(() => {
   updateSchedule();

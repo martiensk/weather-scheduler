@@ -11,5 +11,8 @@
  * @file Colour mode button.
  */
   
+/**
+ * Nuxt state of whether the user is an admin or not.
+ */
 const isAdmin = useState<boolean>('isAdmin', () => false);
 </script>

@@ -1,5 +1,6 @@
 <template>
   <div class="relative">
+
     <UInput
       :model-value="countrySearch"
       class="w-100"
@@ -34,7 +35,7 @@
 
 import type { IWeatherLocation } from 'shared-lib/src/interfaces/weather.interfaces';
 
-const props = defineProps({
+defineProps({
   modelValue: {
     type: String,
     default: '',
@@ -43,18 +44,53 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 const config = useRuntimeConfig();
 
+//#region Properties
+/**
+ * An array of objects representing the available country options.
+ */
 const selectCountryOptions: Ref<{ name: string, value: string }[]> = ref([]);
-const countrySearch = ref('');
-const countryHasFocus = ref(false);
-const countriesLoading = ref(false);
-const lastCountryInput = ref<number | null>(null);
-const dirty = ref(false);
 
+/**
+ * The search query string.
+ */
+const countrySearch = ref('');
+
+/**
+ * Indicates whether the country input field has focus or not.
+ */
+const countryHasFocus = ref(false);
+
+/**
+ * Indicates whether the countries are currently being loaded in a search.
+ */
+const countriesLoading = ref(false);
+
+/**
+ * A timestamp of the last time the country input was changed.
+ */
+const lastCountryInput = ref<number | null>(null);
+
+/**
+ * Indicates whether the component has been modified. If so it is eligible to display an error state.
+ */
+const dirty = ref(false);
+//#endregion
+
+//#region Methods
+
+/**
+ * Function to handle blur event on country input field.
+ * Sets countryHasFocus to false and dirty to true.
+ */
 const blur = () => {
   countryHasFocus.value = false;
   dirty.value = true;
 };
 
+/**
+ * Updates the country search input and triggers input monitoring.
+ * @param {string} input - The input string to update the country search with.
+ */
 const countrySearchInput = (input: string) => {
   countrySearch.value = input;
   if(!lastCountryInput.value) {
@@ -65,6 +101,9 @@ const countrySearchInput = (input: string) => {
   lastCountryInput.value = new Date().getTime();
 };
 
+/**
+ * Monitors the input field for changes and calls the getCountries function if the input has changed and the time since the last call is greater than 800ms.
+ */
 const doInputMonitoring = () => {
   if(!lastCountryInput.value) { return; }
   // Bit of logic to stop the API being called too often.
@@ -77,6 +116,10 @@ const doInputMonitoring = () => {
   window.requestAnimationFrame(doInputMonitoring);
 };
 
+/**
+ * Fetches weather locations based on a search query and populates the select options with the results.
+ * @async
+ */
 const getCountries = async() => {
   if(!countrySearch.value) { return; }
   const { data } = await useFetch<IWeatherLocation[]>(`${config.public.apiBase}/weather/search?q=${countrySearch.value}`);
@@ -94,6 +137,10 @@ const getCountries = async() => {
   }
 };
 
+/**
+ * Selects a country based on the provided ID.
+ * @param {string} id - The ID of the country to select.
+ */
 const selectCountry = (id: string) => {
   if(!id) { return; }
   if(selectCountryOptions.value.length) {
@@ -104,6 +151,8 @@ const selectCountry = (id: string) => {
     }
   }
 };
+//#endregion
+
 </script>
 <style scoped>
 .ul {
