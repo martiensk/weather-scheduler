@@ -44,9 +44,8 @@
 /** 
  * @file Index.
  */
-import type { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
-import { EWSSMessageType } from 'shared-lib/src/enums/wss.enums';
-import { EJobType } from 'shared-lib/src/enums/jobs.enums';
+import { EWSSMessageType,EJobType } from 'shared-lib';
+import type { IScheduledJob } from 'shared-lib';
 
 //#region Properties
 const config = useRuntimeConfig();

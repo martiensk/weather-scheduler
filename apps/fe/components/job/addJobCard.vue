@@ -48,7 +48,7 @@
  * @file A card that allows us to add a job.
  */
 
-import { EJobType } from 'shared-lib/src/enums/jobs.enums';
+import { EJobType } from 'shared-lib';
 
 const emit = defineEmits(['close']);
 

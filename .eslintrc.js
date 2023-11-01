@@ -13,7 +13,23 @@ module.exports = {
     'plugin:vue/vue3-recommended',
     'eslint:recommended',
     '@vue/eslint-config-typescript',
+    'plugin:import/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings'
   ],
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.ts', '.vue']
+      },
+      alias: {
+        map: [
+          ['@', './src']
+        ],
+        extensions: ['.js', '.ts', '.vue']
+      }
+    }
+  },
   rules: {
     //#region JS/TS
     'no-multiple-empty-lines': ['error', { max: 1 }],
@@ -76,7 +92,7 @@ module.exports = {
     'switch-colon-spacing': ['error'],
     'arrow-body-style': ['warn', 'as-needed'],
     'arrow-parens': ['warn', 'always'],
-    'no-duplicate-imports': 'error',
+    'no-duplicate-imports': 'off',
     'no-obj-calls': 'error',
     'object-shorthand': 'error',
     'prefer-arrow-callback': [

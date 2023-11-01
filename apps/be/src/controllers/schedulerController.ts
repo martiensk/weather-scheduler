@@ -1,7 +1,7 @@
 /**
  * @file Controller for the scheduler routes.
  */
-import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
+import type { IScheduledJob } from 'shared-lib';
 import { getAllScheduledJobs, saveJob, deleteAJob } from '../services/schedulerService';
 import { getAllJobDetails } from './../services/jobsService';
 import { Request, Response } from 'express';

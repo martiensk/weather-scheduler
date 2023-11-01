@@ -3,12 +3,11 @@
  */
 import { getCache, setCache } from '../repositories/cacheRepository';
 import { ECacheKeys } from '../enums/cacheKeys.enum';
-import { IWeatherCurrent } from 'shared-lib/src/interfaces/weather.interfaces';
-import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
+import type { IWeatherCurrent, IScheduledJob } from 'shared-lib';
+import { EJobType } from 'shared-lib';
 import { getWeather } from '../repositories/weatherRepository';
 import { getAllScheduledJobs } from './schedulerService';
 import { sendMessage } from './socketService';
-import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 
 /**
  * Retrieves all scheduled job details and their last run history from cache.

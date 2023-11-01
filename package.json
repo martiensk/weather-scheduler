@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --ext .js,.ts,.vue --fix --ignore-path .gitignore apps/be apps/fe packages/shared-lib"
+    "lint": "eslint --ext .js,.ts,.vue --fix --ignore-path .gitignore apps/be apps/fe packages/shared-lib",
+    "build:all": "npm --prefix ./packages/shared-lib run build && npm --prefix ./apps/be run build && npm --prefix ./apps/fe run build",
+    "build:shared-lib": "npm --prefix ./packages/shared-lib run build",
+    "build:apps/be": "npm --prefix ./apps/be run build",
+    "build:apps/fe": "npm --prefix ./apps/fe run build"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +21,8 @@
   ],
   "devDependencies": {
     "@vue/eslint-config-typescript": "^12.0.0",
-    "eslint": "^8.52.0"
+    "eslint": "^8.52.0",
+    "eslint-plugin-import": "^2.29.0"
   },
   "dependencies": {
     "eslint-plugin-jsdoc": "^46.8.2",

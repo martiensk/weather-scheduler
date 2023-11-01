@@ -2,13 +2,15 @@
   "name": "shared-lib",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/cjs/index.js",
+  "module": "build/esm/index.js",
   "devDependencies": {
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
+    "build:clean": "rm -rf ./build",
+    "build": "npm run build:clean && npm run compile && node ./prepare-package-json"
   },
   "author": "",
   "license": "ISC"

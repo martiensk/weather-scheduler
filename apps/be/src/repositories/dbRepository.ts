@@ -3,7 +3,7 @@
  */
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
-import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
+import type { IScheduledJob } from 'shared-lib';
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 

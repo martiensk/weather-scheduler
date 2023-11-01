@@ -1,12 +1,12 @@
 /**
  * @file This file contains the scheduler service.
  */
-import { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
+import type { IScheduledJob } from 'shared-lib';
+import { EJobType } from 'shared-lib';
 import { deleteJob, fetchAllJobs, insertJob } from '../repositories/dbRepository';
 import { getCache, setCache } from '../repositories/cacheRepository';
 import { ECacheKeys } from '../enums/cacheKeys.enum';
 import { Job, scheduleJob } from 'node-schedule';
-import { EJobType } from 'shared-lib/src/enums/jobs.enums';
 import { weatherJob } from './jobsService';
 
 /**

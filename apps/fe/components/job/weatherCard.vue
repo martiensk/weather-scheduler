@@ -88,7 +88,7 @@
 /**
  * @file Weather card.
  */
-import type { IScheduledJob } from 'shared-lib/src/interfaces/jobs.interfaces';
+import type { IScheduledJob } from 'shared-lib';
 
 const props = defineProps({
   weather: {

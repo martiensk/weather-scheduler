@@ -7,5 +7,8 @@ import runtimeConfig from './config.json';
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxt/ui'],
-  runtimeConfig
+  runtimeConfig,
+  build: {
+    transpile: ['shared-lib']
+  }
 });

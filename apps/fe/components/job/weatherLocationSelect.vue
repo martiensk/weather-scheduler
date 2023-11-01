@@ -33,7 +33,7 @@
  * @file A component to look up a country from the weather API.
  */
 
-import type { IWeatherLocation } from 'shared-lib/src/interfaces/weather.interfaces';
+import type { IWeatherLocation } from 'shared-lib';
 
 defineProps({
   modelValue: {
