@@ -7,7 +7,6 @@ import passport from 'passport';
 import querystring from 'querystring';
 
 const router = express.Router();
-require('dotenv').config();
 
 // router.get('/login', 
 //   passport.authenticate('auth0', { 

@@ -8,6 +8,7 @@ import { EJobType } from 'shared-lib';
 import { getWeather } from '../repositories/weatherRepository';
 import { getAllScheduledJobs } from './schedulerService';
 import { sendMessage } from './socketService';
+import config from '../config.json';
 
 /**
  * Retrieves all scheduled job details and their last run history from cache.
@@ -48,7 +49,7 @@ export const weatherJob = async(job: IScheduledJob) => {
   }
 
   // Check if we reached the max historic records and remove the oldest one if so.
-  const maxRecords = Number(process.env.WEATHER_MAX_HISTORY) || 10;
+  const maxRecords = Number(config.weather.max_history) || 10;
   if(cachedWeathers.length >= maxRecords) {
     cachedWeathers.shift();
   }

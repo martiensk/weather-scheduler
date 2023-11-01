@@ -5,7 +5,7 @@ module.exports = {
   apps: [
     {
       name: 'backend',
-      script: './apps/be/build/server.js',
+      script: './apps/be/build/bin/www.js',
       instances: 1,
       autorestart: true,
       watch: false,

@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import expressSession, { SessionOptions } from 'express-session';
 import cors from 'cors';
+import config from './config.json';
 
 //#region Services
 import { init } from './services/startupService';
@@ -16,13 +17,11 @@ import usersRouter from './routes/users';
 import checkRouter from './routes/scheduler';
 import weatherRouter from './routes/weather';
 
-require('dotenv').config();
-
 const app = express();
 app.use(cors());
 
 const session = {
-  secret: process.env.SESSION_SECRET,
+  secret: config.session_secret,
   cookie: {} as CookieOptions,
   resave: false,
   saveUninitialized: false

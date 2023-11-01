@@ -3,6 +3,7 @@
  */
 import type { IWeatherCurrent, IWeatherLocation } from 'shared-lib';
 import axios from 'axios';
+import config from '../config.json';
 
 const baseEndpoint = 'https://api.weatherapi.com/v1/';
 
@@ -15,7 +16,7 @@ const baseEndpoint = 'https://api.weatherapi.com/v1/';
 export const getLocations = async(query: string) => {
   try {
     // This could technically be moved to a repository (and should be) but at this point it's just duplication.
-    const response = await axios.get(`${baseEndpoint}search.json?key=${process.env.WEATHER_API_KEY}&q=${query}`);
+    const response = await axios.get(`${baseEndpoint}search.json?key=${config.weather.api_key}&q=${query}`);
     return response.data as IWeatherLocation[];
   } catch (ex) {
     console.log(ex);
@@ -32,7 +33,7 @@ export const getLocations = async(query: string) => {
 export const getWeather = async(query: string) => {
   try {
     // No localisation supported (out of scope) so we'll just use English.
-    const response = await axios.get(`${baseEndpoint}current.json?key=${process.env.WEATHER_API_KEY}&q=${query}&lang=en`);
+    const response = await axios.get(`${baseEndpoint}current.json?key=${config.weather.api_key}&q=${query}&lang=en`);
     return response.data as IWeatherCurrent;
   } catch (ex) {
     console.log(ex);

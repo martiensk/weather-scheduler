@@ -12,6 +12,7 @@ import { startWSS } from '../services/socketService';
 import app from '../server';
 import debug from 'debug';
 import http from 'http';
+import config from '../config.json';
 
 /**
  * Normalize a port into a number, string, or false.
@@ -76,7 +77,7 @@ const onListening = () => {
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '5000');
+const port = normalizePort(config.port || '5000');
 app.set('port', port);
 
 /**

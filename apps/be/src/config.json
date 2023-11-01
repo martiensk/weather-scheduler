@@ -1,0 +1,8 @@
+{
+    "port": "5000",
+    "weather": {
+        "api_key": "125530ea75df4e98811140411232710",
+        "max_history": 10
+    },
+    "session_secret": "secret"
+}
