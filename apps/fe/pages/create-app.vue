@@ -2,45 +2,27 @@
   <UContainer>
     <UCard class="max-w-[400px] m-auto my-8">
 
-      <UInput
-        v-model="password"
-        :type="type"
-        :ui="{ icon: { trailing: { pointer: '' } } }"
-        :color="!isValid ? 'red' : 'white'"
-        placeholder="Set the Administrator password..."
-        @blur="dirty = true">
+      <form @submit.prevent="submit">
 
-        <template #trailing>
-          <UButton
-            class="z-10"
-            color="gray"
-            variant="link"
-            :padded="false"
-            :icon="type === 'password' ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
-            @click="toggleType" />
-        </template>
+        <UiInputPassword
+          v-model="password"
+          @is-valid="setValid" />
 
-      </UInput>
+        <UButton
+          class="mt-4 mb-2"
+          size="xs"
+          :disabled="!isValid"
+          :loading="processing"
+          type="submit"
+          @click="submit">
+          Submit
+        </UButton>
 
-      <p
-        v-if="!isValid"
-        class="text-xs m-1 text-red-500">
-        Password must contain 8 or more characters, an uppercase and lowercase letter, and a number.
-      </p>
+        <p class="text-xs text-gray-400">
+          * Make sure to take note of your password, you cannot change it afterwards.
+        </p>
 
-      <UButton
-        class="mt-4 mb-2"
-        size="xs"
-        :disabled="!isValid"
-        :loading="processing"
-        @click="submit">
-        Submit
-      </UButton>
-
-      <p class="text-xs text-gray-400">
-        * Make sure to take note of your password, you cannot change it afterwards.
-      </p>
-
+      </form>
     </UCard>
   </UContainer>
 </template>
@@ -51,33 +33,51 @@
 
 const config = useRuntimeConfig();
 
+//#region Properties
+/**
+ * Ref for password input field.
+ */
 const password = ref('');
-const dirty = ref(false);
-const type = ref('password');
+
+/**
+ * Indicates whether the form is currently being processed.
+ */
 const processing = ref(false);
 
-const toggleType = (): void => {
-  type.value = type.value === 'password' ? 'text' : 'password';
+/**
+ * Indicates whether the input is valid or not.
+ */
+const isValid = ref(false);
+//#endregion
+
+//#region Methods
+/**
+ * Sets the value of isValid to the given boolean value.
+ * @param {boolean} evt - The boolean value to set isValid to.
+ */
+const setValid = (evt: boolean) => {
+  isValid.value = evt;
 };
 
-const isValid = computed(() => !dirty.value || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password.value));
-
-const submit = () => {
-  if(isValid.value && dirty.value) {
+/**
+ * Sends a POST request to set the user's password.
+ * Shows a success toast and navigates to the home page if the password is set successfully.
+ * Shows an error toast if there is a problem setting the password.
+ */
+const submit = async() => {
+  if(isValid.value) {
     processing.value = true;
     const toast = useToast();
 
     try {
 
-      const { data } = useFetch<{ success: boolean }>(config.public.apiBase + '/auth/set-user', {
+      const { data } = await useFetch<{ success: boolean }>(config.public.apiBase + '/auth/set-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ password: password.value })
       });
-
-      console.log(data, data.value);
 
       if(data.value?.success) {
 
@@ -91,7 +91,8 @@ const submit = () => {
           actions: []
         });
 
-        navigateTo('/');
+        // We do not want to load the route client-side as we rely on server logic to enable the admin mode.
+        window.location.href = '/';
         return;
       }
 
@@ -113,9 +114,7 @@ const submit = () => {
     }
 
   }
-  if(!dirty.value) {
-    dirty.value = true;
-  }
 };
+//#endregion
 
 </script>

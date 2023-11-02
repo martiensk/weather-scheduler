@@ -151,6 +151,14 @@ export const deleteJob = async(jobId: number) => {
   await db.run('UPDATE JobSchedule SET Active = 0 WHERE Id = ?', [jobId]);
 };
 
+/**
+ * Inserts a new user into the database.
+ * @param {string} username - The username of the user.
+ * @param {string} password - The password of the user.
+ * @param {EUserRole} role - The role of the user.
+ * @returns {number} The ID of the newly inserted user.
+ * @throws An error if the database is not initialised or if the user insertion fails.
+ */
 export const insertUser = async(username: string, password: string, role: EUserRole) => {
   if (!db) {
     throw new Error('Database not initialised');
@@ -164,19 +172,25 @@ export const insertUser = async(username: string, password: string, role: EUserR
   return table1Id;
 };
 
+/**
+ * Retrieves a user from the database by their username.
+ * @param {string} username - The username of the user to retrieve.
+ * @returns {IUser} The user object if found, otherwise null.
+ * @throws Error if the database is not initialised.
+ */
 export const getUser = async(username: string) => {
   if (!db) {
     throw new Error('Database not initialised');
   }
 
-  const data = await db.all<{ Username: string, Password: string, Role: EUserRole}>('SELECT Username, Password, Role FROM Users where Username = ? LIMIT 1', [username]);
-  console.log(data);
-  if(!data) {
+  const data = await db.all<{ Username: string, Password: string, Role: EUserRole}[]>('SELECT Username, Password, Role FROM Users where Username = ? LIMIT 1', [username]);
+  
+  if(!data || !data.length) {
     return null;
   }
   return {
-    username: data.Username,
-    password: data.Password,
-    role: data.Role
+    username: data[0].Username,
+    password: data[0].Password,
+    role: data[0].Role
   } as IUser;
 };

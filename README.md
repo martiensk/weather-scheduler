@@ -1,4 +1,4 @@
-# weather-scheduler
+# Job Scheduler App
 
 ## What is this?
 This is an example JavaScript web application showcasing both front- and back-end technology tech-stacks.<br />
@@ -11,13 +11,14 @@ The user is able to schedule and delete jobs as required.
 The application is a Monorepo build using NPM with a shared package library, a NodeJS back-end and a Nuxt (Vue) front-end. The entire application is containerised in a Docker container.
 ### Technology used
 - NPM Monorepo
+- WebSocket communication.
+- Basic JWT authentication.
 - TypeScript
 - Docker
 #### Front-end
  - Nuxt
  - Vue3 composition API
- - Tailwind CSS
- - Vite
+ - Tailwind CS
 #### Back-End
  - Express
  - Cron-like scheduling for jobs

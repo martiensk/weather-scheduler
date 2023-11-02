@@ -92,9 +92,28 @@ const save = async() => {
   const toast = useToast();
   const config = useRuntimeConfig();
 
+  const token = useCookie<string>('token');
+
+  if(!token.value) {
+    toast.add({
+      id: 'delete_weather_failed',
+      title: 'Error!',
+      description: 'You must be logged in to delete a weather job.',
+      icon: 'i-heroicons-x-mark',
+      timeout: 5000,
+      color: 'red',
+      actions: []
+    });
+    emit('close');
+    return;
+  }
+
   try {
     const { data } = await useFetch(`${config.public.apiBase}/scheduler/add`, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
       body: JSON.stringify({
         type: selectedJob.value,
         details: { location: selectedCountry.value }, // Obviously needs to be calculated if we add more job types.

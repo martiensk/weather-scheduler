@@ -3,6 +3,7 @@
  */
 import express from 'express';
 import * as schedulerController from '../controllers/schedulerController';
+import { requireAuth } from '../controllers/authController';
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ const router = express.Router();
 router.get('/get-schedules', schedulerController.getAllSchedules);
 router.get('/get-jobs', schedulerController.getAllJobs);
 // POST requests
-router.post('/add', schedulerController.addNewJob);
-router.post('/delete-job', schedulerController.deleteJob);
+router.post('/add', requireAuth, schedulerController.addNewJob);
+router.post('/delete-job', requireAuth, schedulerController.deleteJob);
 
 export default router;

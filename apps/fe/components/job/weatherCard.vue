@@ -178,10 +178,29 @@ const deleteJob = async() => {
   loading.value = true;
   const toast = useToast();
 
+  const token = useCookie<string>('token');
+
+  if(!token.value) {
+    toast.add({
+      id: 'delete_weather_failed',
+      title: 'Error!',
+      description: 'You must be logged in to delete a weather job.',
+      icon: 'i-heroicons-x-mark',
+      timeout: 5000,
+      color: 'red',
+      actions: []
+    });
+    loading.value = false;
+    return;
+  }
+
   try {
     const config = useRuntimeConfig();
     const { data } = await useFetch(`${config.public.apiBase}/scheduler/delete-job`, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
       body: JSON.stringify({
         id: props.weather.id
       })

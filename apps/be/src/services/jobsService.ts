@@ -38,7 +38,7 @@ export const getAllJobDetails = async() => {
  * @param {IScheduledJob} job - The scheduled job object containing the job details.
  */
 export const weatherJob = async(job: IScheduledJob) => {
-  console.log(`Running job ${job.id}`);
+  
   // Get historic weathers from cache
   let cachedWeathers = getCache<IWeatherCurrent[]>(`${ECacheKeys.WEATHER_JOB}_${job.id}`);
 
@@ -117,7 +117,5 @@ export const weatherJob = async(job: IScheduledJob) => {
       runs: cachedWeathers
     }
   }));
-
-  console.log(`Job ${job.id} completed`);
 
 };
