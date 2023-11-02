@@ -16,6 +16,7 @@ import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import checkRouter from './routes/scheduler';
 import weatherRouter from './routes/weather';
+import authRouter from './routes/auth';
 
 const app = express();
 app.use(cors());
@@ -50,5 +51,6 @@ app.use('/', indexRouter);
 app.use('/scheduler', checkRouter);
 app.use('/users', usersRouter);
 app.use('/weather', weatherRouter);
+app.use('/auth', authRouter);
 
 export default app;

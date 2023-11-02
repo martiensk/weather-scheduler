@@ -3,7 +3,10 @@
  */
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
-import type { IScheduledJob } from 'shared-lib';
+import type { IScheduledJob, IUser } from 'shared-lib';
+import { EUserRole } from 'shared-lib';
+import { getCache, setCache } from './cacheRepository';
+import { ECacheKeys } from '../enums/cacheKeys.enum';
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -51,12 +54,22 @@ export const openOrCreateDb = async(): Promise<void> => {
             );
         `);
 
+    await db.run(`CREATE TABLE IF NOT EXISTS Users (            
+            Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            Username TEXT NOT NULL,
+            Password TEXT NOT NULL,
+            Role INTEGER NOT NULL
+        );`);
+        
     // Checking if the DB is empty. If so, populate the schedule tables with some initial data.
     const data = await db.all('SELECT * FROM JobType LIMIT 1');
     if(data.length === 0) {
       await populateDb();
       console.log('Initial schedule data written to DB.');
     }
+    const users = await db.all('SELECT * FROM Users LIMIT 1');
+    setCache<boolean>(ECacheKeys.ADMIN_ACTIVE, users.length > 0);
+    console.log('Users found in DB', users.length, getCache<boolean>(ECacheKeys.ADMIN_ACTIVE));
 
     return;
   }
@@ -90,8 +103,8 @@ export const fetchAllJobs = async() => {
     throw new Error('Database not initialised');
   }
 
-  const data = await db.all('SELECT t2.Id as id, t2.TypeId as type, t2.Details as details, t2.Schedule as schedule FROM JobSchedule t2 where t2.Active = 1');
-  (data as IScheduledJob[]).map((job) => {
+  const data = await db.all<IScheduledJob[]>('SELECT t2.Id as id, t2.TypeId as type, t2.Details as details, t2.Schedule as schedule FROM JobSchedule t2 where t2.Active = 1');
+  data.map((job) => {
     job.details = JSON.parse(job.details as unknown as string);
     return job;
   });
@@ -136,4 +149,34 @@ export const deleteJob = async(jobId: number) => {
   console.log('Deleting job');
 
   await db.run('UPDATE JobSchedule SET Active = 0 WHERE Id = ?', [jobId]);
+};
+
+export const insertUser = async(username: string, password: string, role: EUserRole) => {
+  if (!db) {
+    throw new Error('Database not initialised');
+  }
+  console.log('Inserting user');
+
+  const { lastID: table1Id } = await db.run('INSERT INTO Users (Username, Password, Role) VALUES (?, ?, ?)', [username, password, role]);
+  if(!table1Id) {
+    throw new Error('Failed to insert user');
+  }
+  return table1Id;
+};
+
+export const getUser = async(username: string) => {
+  if (!db) {
+    throw new Error('Database not initialised');
+  }
+
+  const data = await db.all<{ Username: string, Password: string, Role: EUserRole}>('SELECT Username, Password, Role FROM Users where Username = ? LIMIT 1', [username]);
+  console.log(data);
+  if(!data) {
+    return null;
+  }
+  return {
+    username: data.Username,
+    password: data.Password,
+    role: data.Role
+  } as IUser;
 };

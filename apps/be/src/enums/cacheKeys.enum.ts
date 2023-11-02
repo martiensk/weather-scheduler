@@ -7,5 +7,6 @@
  */
 export enum ECacheKeys {
     'SCHEDULED_JOBS' = 'SCHEDULED_JOBS',
-    'WEATHER_JOB' = 'WEATHER_JOB'
+    'WEATHER_JOB' = 'WEATHER_JOB',
+    'ADMIN_ACTIVE' = 'ADMIN_ACTIVE'
 }

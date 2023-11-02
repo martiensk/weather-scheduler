@@ -3,6 +3,7 @@
     :icon="isAdmin ? 'i-heroicons-lock-open' : 'i-heroicons-lock-closed'"
     :color="!isAdmin ? 'green' : 'red'"
     aria-label="Admin Mode"
+    :disabled="!hasAdminRole"
     @click="isAdmin = !isAdmin" />
 </template>
   
@@ -15,4 +16,6 @@
  * Nuxt state of whether the user is an admin or not.
  */
 const isAdmin = useState<boolean>('isAdmin', () => false);
+
+const hasAdminRole = useState('hasAdmin', () => false);
 </script>
